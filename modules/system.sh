@@ -24,7 +24,7 @@ run_system() {
   if $DRY_RUN; then
     echo "🧪 [dry-run] rm -rf $HOME_SYSTEM_CACHES/*"
   else
-    find "$HOME_SYSTEM_CACHES" -maxdepth 1 -type d -not -name '.' -print0 2>/dev/null | xargs -0 rm -rf 2>/dev/null
+    find "$HOME_SYSTEM_CACHES" -maxdepth 1 -not -path "$HOME_SYSTEM_CACHES" -print0 2>/dev/null | xargs -0 -r rm -rf 2>/dev/null || true
   fi
 
   local after=$(size_of "$HOME_SYSTEM_CACHES")
