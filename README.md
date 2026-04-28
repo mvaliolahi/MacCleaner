@@ -20,12 +20,24 @@ cd maccleaner
 sudo ./install.sh
 ```
 
-The script copies the `maccleaner` entrypoint to `/usr/local/bin`.
+Or use the built-in install command:
+
+```bash
+sudo maccleaner --install
+```
+
+The script creates a **symlink** at `/usr/local/bin/maccleaner`.
 
 ## Uninstall
 
 ```bash
 sudo ./uninstall.sh
+```
+
+Or use the built-in uninstall command:
+
+```bash
+sudo maccleaner --uninstall
 ```
 
 ## Usage

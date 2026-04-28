@@ -9,6 +9,48 @@
 
 set -euo pipefail
 
+# Resolve the directory that contains this script (works when symlinked)
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+TARGET="/usr/local/bin/maccleaner"
+
+# -------------------------------------------------------------------------
+# Handle --install and --uninstall early (before loading modules)
+# -------------------------------------------------------------------------
+for arg in "$@"; do
+  case "$arg" in
+    --install)
+      if [[ "$EUID" -ne 0 ]]; then
+        echo "❌ Please run with sudo to install (e.g., sudo maccleaner --install)"
+        exit 1
+      fi
+      
+      if [[ -L "$TARGET" ]] || [[ -f "$TARGET" ]]; then
+        rm -f "$TARGET"
+      fi
+      
+      ln -s "$BASE_DIR/maccleaner" "$TARGET"
+      chmod +x "$TARGET"
+      echo "✅ maccleaner installed to $TARGET (symlinked to $BASE_DIR/maccleaner)"
+      exit 0
+      ;;
+    
+    --uninstall)
+      if [[ "$EUID" -ne 0 ]]; then
+        echo "❌ Please run with sudo to uninstall (e.g., sudo maccleaner --uninstall)"
+        exit 1
+      fi
+      
+      if [[ -f "$TARGET" ]]; then
+        rm -f "$TARGET"
+        echo "✅ maccleaner removed from $TARGET"
+      else
+        echo "⚠️  maccleaner not found at $TARGET"
+      fi
+      exit 0
+      ;;
+  esac
+done
+
 # -------------------------------------------------------------------------
 # Verify required tools are available
 # -------------------------------------------------------------------------
@@ -18,9 +60,6 @@ for tool in du rm numfmt; do
     exit 1
   fi
 done
-
-# Resolve the directory that contains this script (works when symlinked)
-BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # -------------------------------------------------------------------------
 # Load core libraries

@@ -51,12 +51,17 @@ Commands:
   system     Clean macOS user cache
   trash      Empty Trash
 
+Installation:
+  --install   Install maccleaner globally (requires sudo)
+  --uninstall Uninstall maccleaner (requires sudo)
+
 Options:
   --yes      Skip confirmations
   --dry      Preview only
   --help     Show this help
 
 Examples:
+  sudo maccleaner --install
   maccleaner all --yes
   maccleaner docker
   maccleaner --dry
