@@ -1,39 +1,78 @@
-# 🧼 MacCleaner
+# 🧼 maccleaner
 
-> ⚡ Smart • Safe • Developer-first macOS cleanup tool (pure Bash)
+A **pure‑bash**, modular macOS cleanup utility that feels like a real command‑line
+tool (similar to `git` or `brew`). It safely removes caches, stale Docker
+artifacts, Homebrew leftovers, IDE data, and more.
 
-MacCleaner is a lightweight, interactive cleanup script designed for developers who want to reclaim disk space on macOS **without breaking their environment**.
+## Features
 
-It scans and removes hidden caches, unused dependencies, and common disk hogs — all with **explicit confirmation and full transparency**.
+- **Modular architecture** – each cleanup area lives in its own `modules/*.sh`.
+- **Interactive & non‑interactive modes**.
+- **Safety first** – confirmations, `--yes`, and a dry‑run mode (`--dry`).
+- **Progress spinner** and emoji‑rich UX.
+- No external dependencies – only macOS built‑in tools.
 
----
-
-## ✨ Features
-
-- 🧠 **Developer-focused cleanup**
-- ⚡ **Interactive (y/N per section)**
-- ⏳ **Animated CLI spinner (no dependencies)**
-- 📊 **Disk usage summary before/after**
-- 🔒 **Safe by default (no silent deletes)**
-- 🧩 **Zero dependencies (pure Bash)**
-
----
-
-## 🧹 What it cleans
-
-- 🍺 Homebrew cache & unused formulae
-- 🐳 Docker images, volumes, build cache
-- 📦 Node.js caches (npm, yarn, pnpm)
-- 🐍 Python pip cache
-- 🧑‍💻 Xcode DerivedData & archives
-- 🧠 IDE caches (VS Code, JetBrains)
-- 🧼 macOS user caches (safe scope)
-- 🗑 Trash
-
----
-
-## 🚀 Usage
+## Installation
 
 ```bash
-chmod +x run.sh
-./run.sh
+git clone <repo-url>
+cd maccleaner
+sudo ./install.sh
+```
+
+The script copies the `maccleaner` entrypoint to `/usr/local/bin`.
+
+## Uninstall
+
+```bash
+sudo ./uninstall.sh
+```
+
+## Usage
+
+```bash
+maccleaner                # Interactive menu (full cleanup)
+maccleaner all            # Run every module automatically
+maccleaner brew           # Homebrew cleanup only
+maccleaner docker         # Docker system cleanup
+maccleaner node           # Node.js caches
+maccleaner python         # pip cache
+maccleaner java           # Maven/Gradle caches
+maccleaner xcode          # Xcode DerivedData, archives, simulators
+maccleaner ide            # JetBrains & VS Code caches
+maccleaner system         # User‑level system caches (safe only)
+maccleaner trash          # Empty the Trash
+```
+
+### Flags
+
+| Flag   | Description                              |
+|--------|------------------------------------------|
+| `--yes`| Skip all confirmations (auto‑accept).   |
+| `--dry`| Show what would be removed, do **not** delete. |
+| `--help`| Show help message.                     |
+
+**Examples**
+
+```bash
+maccleaner all --yes          # Full cleanup without prompts
+maccleaner docker --dry       # Show Docker prune actions without executing
+maccleaner               # Interactive selection menu
+```
+
+## Safety Notes
+
+- The tool never touches system‑protected directories.
+- Each module prints the size of data **before** and **after** cleaning.
+- `--dry` mode is perfect for auditing what will be removed.
+- Confirmations can be bypassed with `--yes`.
+
+## Extending
+
+Add a new module by creating `modules/<name>.sh` with a `run_<name>`
+function. Use the helper functions from `lib/` (`size_of`, `safe_rm`,
+`run_with_spinner`, `add_summary`, etc.) to keep behavior consistent.
+
+## License
+
+MIT – feel free to fork, improve, and share.
