@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# =============================================================================
+# maccleaner – a modular, safe macOS cleanup utility
+# =============================================================================
+# This script is the CLI entry point. It loads core libraries, parses flags,
+# dispatches sub‑commands, and presents an interactive menu when invoked without
+# arguments.
+# =============================================================================
+
+set -euo pipefail
+
+# -------------------------------------------------------------------------
+# Verify required tools are available
+# -------------------------------------------------------------------------
+for tool in du rm numfmt; do
+  if ! command -v "$tool" &> /dev/null; then
+    echo "❌ Required tool not found: $tool"
+    exit 1
+  fi
+done
+
+# Resolve the directory that contains this script (works when symlinked)
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# -------------------------------------------------------------------------
+# Load core libraries
+# -------------------------------------------------------------------------
+source "$BASE_DIR/lib/ui.sh"
+source "$BASE_DIR/lib/utils.sh"
+source "$BASE_DIR/lib/summary.sh"
+source "$BASE_DIR/lib/config.sh"
+source "$BASE_DIR/lib/flags.sh"
+
+# -------------------------------------------------------------------------
+# Load all modules (each defines a run_<name> function)
+# -------------------------------------------------------------------------
+for m in "$BASE_DIR"/modules/*.sh; do
+  source "$m"
+done
+
+# -------------------------------------------------------------------------
+# Initialise state
+# -------------------------------------------------------------------------
+init_summary
+parse_flags "$@"
+
+# -------------------------------------------------------------------------
+# UI pre‑run
+# -------------------------------------------------------------------------
+print_logo
+print_system_info
+
+# -------------------------------------------------------------------------
+# Command dispatch
+# -------------------------------------------------------------------------
+COMMAND="${1:-}"
+
+case "$COMMAND" in
+  brew)    run_brew   ;;
+  docker)  run_docker ;;
+  node)    run_node   ;;
+  python)  run_python ;;
+  java)    run_java   ;;
+  xcode)   run_xcode  ;;
+  ide)     run_ide    ;;
+  system)  run_system ;;
+  trash)   run_trash  ;;
+
+  all)     run_all    ;;
+
+  "")      interactive_mode ;;
+  *)       echo "❌ Unknown command: $COMMAND"
+           print_help
+           exit 1 ;;
+esac
+
+# -------------------------------------------------------------------------
+# Final summary
+# -------------------------------------------------------------------------
+print_summary
